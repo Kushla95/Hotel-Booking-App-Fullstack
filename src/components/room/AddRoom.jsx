@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { addRoom } from "../utils/ApiFunctions";
+import RoomTypeSelector from "../common/RoomTypeSelector";
 
 const AddRoom = () => {
   const [newRoom, setNewRoom] = useState({
@@ -17,7 +18,7 @@ const AddRoom = () => {
     let value = e.target.value;
     if (name === "roomPrice") {
       if (!isNaN(value)) {
-        value.parseInt(value);
+        value = parseInt(value);
       } else {
         value = "";
       }
@@ -50,6 +51,11 @@ const AddRoom = () => {
     } catch (error) {
       setErrorMessage(error.message);
     }
+
+    setTimeout(() => {
+      setSuccessMessage("");
+      setErrorMessage("");
+    }, 3000);
   };
 
   return (
@@ -59,12 +65,28 @@ const AddRoom = () => {
           <div className="col-md-8 col-lg-6">
             <h2 className="mt-5 mb-5">Add a New Room</h2>
 
+            {successMessage && (
+              <div className="alert alert-success fade show">
+                {" "}
+                {successMessage}{" "}
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="alert alert-danger fade show">{errorMessage}</div>
+            )}
+
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label htmlFor="roomType" className="form-label">
                   Room Type
                 </label>
-                <div></div>
+                <div>
+                  <RoomTypeSelector
+                    handleRoomInputChange={handleRoomInputChange}
+                    newRoom={newRoom}
+                  />
+                </div>
               </div>
 
               <div className="mb-3">
@@ -93,7 +115,7 @@ const AddRoom = () => {
                   className="form-control"
                   onChange={handleImageChange}
                 />
-                {imagePreviw && (
+                {imagePreview && (
                   <img
                     src={imagePreview}
                     alt="Preview Room Photo"
