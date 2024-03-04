@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { getRoomTypes } from "../utils/ApiFunctions";
 
@@ -7,10 +8,17 @@ const RoomTypeSelector = ({ handleRoomInputChange, newRoom }) => {
   const [newRoomType, setNewRoomType] = useState("");
 
   useEffect(() => {
-    getRoomTypes().then((data) => {
-      setRoomTypes(data);
-    });
+    fetchRoomTypes();
   }, []);
+
+  const fetchRoomTypes = async () => {
+    try {
+      const types = await getRoomTypes();
+      setRoomTypes(types);
+    } catch (error) {
+      console.error("Error fetching room types:", error.message);
+    }
+  };
 
   const handleNewRoomTypeInputChange = (e) => {
     setNewRoomType(e.target.value);
@@ -26,7 +34,7 @@ const RoomTypeSelector = ({ handleRoomInputChange, newRoom }) => {
 
   return (
     <>
-      {roomTypes.length > 0 && (
+      {roomTypes && roomTypes.length > 0 && (
         <div>
           <select
             required
@@ -71,6 +79,11 @@ const RoomTypeSelector = ({ handleRoomInputChange, newRoom }) => {
       )}
     </>
   );
+};
+
+RoomTypeSelector.propTypes = {
+  handleRoomInputChange: PropTypes.func.isRequired,
+  newRoom: PropTypes.object.isRequired,
 };
 
 export default RoomTypeSelector;
