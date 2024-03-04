@@ -11,6 +11,7 @@ import javax.sql.rowset.serial.SerialException;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rooms")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class RoomController {
 
     private final IRoomService roomService;
@@ -48,12 +50,13 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/room/types")
+    @GetMapping("/rooms/room-types")
     public List<String> getRoomTypes() {
         return roomService.getAllRoomTypes();
     }
 
-    public ResponseEntity<List<RoomResponse>> getAllRooms() {
+    @GetMapping("/rooms/all-rooms")
+    public ResponseEntity<List<RoomResponse>> getAllRooms() throws SQLException {
         List<Room> rooms = roomService.getAllRooms();
         List<RoomResponse> roomResponses = new ArrayList<>();
         for (Room room : rooms) {
@@ -70,12 +73,16 @@ public class RoomController {
     }
 
     private RoomResponse getRoomResponse(Room room) {
+
         List<BookedRoom> bookings = getAllBookingsByRoomId(room.getId());
-        List<BookingResponse> bookingInfo = bookings
-                .stream()
-                .map(booking -> new BookingResponse(booking.getBookingId(),
-                        booking.getCheckInDate(), booking.getCheckOutDate(), booking.getBookingConfirmationCode()))
-                .toList();
+        /*
+         * List<BookingResponse> bookingInfo = bookings
+         * .stream()
+         * .map(booking -> new BookingResponse(booking.getBookingId(),
+         * booking.getCheckInDate(), booking.getCheckOutDate(),
+         * booking.getBookingConfirmationCode()))
+         * .toList();
+         */
 
         byte[] photoBytes = null;
         Blob photoBlob = room.getPhoto();
@@ -88,7 +95,7 @@ public class RoomController {
 
         }
         return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(),
-                room.isBooked(), photoBytes, bookingInfo);
+                room.isBooked(), photoBytes);
     }
 
     private List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
