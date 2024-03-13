@@ -32,7 +32,7 @@ public class BookingController {
     private final IBookingService bookingService;
     private final IRoomService roomService;
 
-    @GetMapping("all-bookings")
+    @GetMapping("/all-bookings")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
         List<BookedRoom> bookings = bookingService.getAllBookings();
         List<BookingResponse> bookingResponses = new ArrayList<>();
